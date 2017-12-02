@@ -1,11 +1,11 @@
 <template>
-    <div class="page1">
-        页面1
+    <div class="page4">
+        页面4
     </div>
 </template>
 
 <style>
-    .page1 {
+    .page4 {
         position: fixed;
         width: 100%;
         height: 100%;

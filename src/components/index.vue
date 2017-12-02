@@ -2,7 +2,7 @@
     <div class="main">
         <div class="page-tab">
             <div 
-                class="tab-item"
+                :class="nowPath == item.to ? 'tab-item tab-item_active' : 'tab-item'"
                 v-for='(item, index) in tabList'
                 :key="index">
                 <router-link 
@@ -11,7 +11,7 @@
                 </router-link>
             </div>        
         </div>
-        <transition name="fade">
+        <transition name="slide">
             <slot>
             </slot> 
         </transition>
@@ -23,11 +23,12 @@ import Swiper from './swiper';
 
 export default {
     mounted() {
-        console.log(this.$el);
-        new Swiper(this.$el, this.tabList, this.$router);
+        this.nowPath = this.$route.path;
+        this.tabSwiper = new Swiper(this.$el, this.tabList, this.$router, this.$route.path);
     },
     data() {
         return {
+            tabSwiper: {},
             tabList: [{
                 name: 'tab1',
                 to: '/'
@@ -36,23 +37,22 @@ export default {
                 to: '/page2'
             }, {
                 name: 'tab3',
-                to: '/'
+                to: '/page3'
             }, {
                 name: 'tab4',
-                to: '/page2'
+                to: '/page4'
             }],
-            distanceX: 0,
-            startX: 0
+            nowPath: ''
         };
     },
     methods: {
     },
     watch: {
         '$route' (to, from) {
+            this.nowPath = to.path;
+            this.tabSwiper.upDateNowPath(to.path);
             const toDepth = to.path.split('/').length;
             const fromDepth = from.path.split('/').length;
-            console.log(to.path);
-            console.log(from.path);
         }
     }
 };
@@ -63,23 +63,39 @@ export default {
         margin: 0;
         padding: 0;
     }
+    body {
+        height: 100%;
+        width: 100%;
+        background-color: #fbf9fe;
+    }
+    a {
+        color: #333;
+        text-decoration: none;
+    }
     .page-tab {
         display: flex;
+        justify-content: center;
     }
     .tab-item {
         text-align: center;
+        align-items: center;
+        height: 44px;
+        line-height: 44px;
         flex: 1;
-        background-color: #ccc;
+        height: 100%;
+        background-color: #fff;
     }
-    .tab-item a {
-        color: #333;
+    .tab-item_active {
+        color: #f90;
+        border-bottom: 3px solid #f90;
     }
-    .fade-enter-active, .fade-leave-active {
+    .slide-enter-active, .slide-leave-active {
         position: absolute;
-        transition: opacity 1.5s;
+        transition: all .5s;
+        transform: translate3d(0px, 0px, 0px);
     }
-    .fade-enter, .fade-leave-to /* .fade-leave-active in below version 2.1.8 */ {
+    .slide-enter, .slide-leave-to /* .fade-leave-active in below version 2.1.8 */ {
         position: absolute;
-        opacity: 0
+        transform: translate3d(-200px, 0px, 0px);
     }
 </style>

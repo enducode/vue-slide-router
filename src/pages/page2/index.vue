@@ -6,7 +6,6 @@
 
 <style>
     .page2 {
-        background-color: #99CCCC;
         position: fixed;
         width: 100%;
         height: 100%;
