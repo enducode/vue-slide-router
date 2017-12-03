@@ -1,5 +1,5 @@
 <template>
-    <div class="page4">
+    <div class="page page4">
         页面4
     </div>
 </template>

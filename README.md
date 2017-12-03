@@ -1,6 +1,10 @@
 # slide-router
 
-> A Vue.js project
+> 移动端滑动切换vue router
+
+效果演示
+
+![demo](preview/demo.gif)
 
 ## Build Setup
 
@@ -27,4 +31,3 @@ npm run e2e
 npm test
 ```
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).

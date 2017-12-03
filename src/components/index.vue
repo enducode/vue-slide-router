@@ -2,16 +2,16 @@
     <div class="main">
         <div class="page-tab">
             <div 
-                :class="nowPath == item.to ? 'tab-item tab-item_active' : 'tab-item'"
+                :class="nowPath == item.path ? 'tab-item tab-item_active' : 'tab-item'"
                 v-for='(item, index) in tabList'
                 :key="index">
                 <router-link 
                     mode="out-in"
-                    :to="item.to">{{item.name}}
+                    :to="item.path">{{item.name}}
                 </router-link>
             </div>        
         </div>
-        <transition name="slide">
+        <transition :name="slideDirection">
             <slot>
             </slot> 
         </transition>
@@ -19,40 +19,54 @@
 </template>
 
 <script>
-import Swiper from './swiper';
 
 export default {
+    props: {
+        tabList: Array
+    },
     mounted() {
         this.nowPath = this.$route.path;
-        this.tabSwiper = new Swiper(this.$el, this.tabList, this.$router, this.$route.path);
+        this.initTouchedEvent();
     },
     data() {
         return {
             tabSwiper: {},
-            tabList: [{
-                name: 'tab1',
-                to: '/'
-            }, {
-                name: 'tab2',
-                to: '/page2'
-            }, {
-                name: 'tab3',
-                to: '/page3'
-            }, {
-                name: 'tab4',
-                to: '/page4'
-            }],
-            nowPath: ''
+            slideDirection: 'slideforward',
+            nowPath: '',
+            startX: ''
         };
     },
     methods: {
+        touchedstartHandler(e) {
+            this.startX = e.changedTouches[0].pageX;
+        },
+        touchendHandler(e) {
+            let direction = this.startX - e.changedTouches[0].pageX;
+            let nowRouteIndex = 0;
+            this.tabList.forEach((v, index) => {
+                if (v.path == this.nowPath) {
+                    nowRouteIndex = index;
+                }
+            });
+            if (direction >= 0 && nowRouteIndex < this.tabList.length - 1) {
+                //设置向前动画
+                this.slideDirection = 'slideforward';
+                this.$router.push({'path': this.tabList[nowRouteIndex + 1].path});
+            } 
+            if (direction < 0 && nowRouteIndex > 0) {
+                //设置向后动画
+                this.slideDirection = 'slideback';
+                this.$router.push({'path': this.tabList[nowRouteIndex - 1].path});
+            }
+        },
+        initTouchedEvent() {
+            this.$el.addEventListener('touchstart', this.touchedstartHandler.bind(this));
+            this.$el.addEventListener('touchend', this.touchendHandler.bind(this));
+        },
     },
     watch: {
         '$route' (to, from) {
             this.nowPath = to.path;
-            this.tabSwiper.upDateNowPath(to.path);
-            const toDepth = to.path.split('/').length;
-            const fromDepth = from.path.split('/').length;
         }
     }
 };
@@ -72,6 +86,11 @@ export default {
         color: #333;
         text-decoration: none;
     }
+    .page {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
     .page-tab {
         display: flex;
         justify-content: center;
@@ -86,16 +105,27 @@ export default {
         background-color: #fff;
     }
     .tab-item_active {
-        color: #f90;
         border-bottom: 3px solid #f90;
     }
-    .slide-enter-active, .slide-leave-active {
+    .tab-item_active a {
+        color: #f90;
+    }
+    .slideforward-enter-active, .slideforward-leave-active {
         position: absolute;
         transition: all .5s;
         transform: translate3d(0px, 0px, 0px);
     }
-    .slide-enter, .slide-leave-to /* .fade-leave-active in below version 2.1.8 */ {
+    .slideforward-enter, .slideforward-leave-to {
         position: absolute;
-        transform: translate3d(-200px, 0px, 0px);
+        transform:  translate3d(200px, 0px, 0px);
+    }
+    .slideback-enter-active, .slideback-leave-active {
+        position: absolute;
+        transition: all .5s;
+        transform: translate3d(0px, 0px, 0px);
+    }
+    .slideback-enter, .slideback-leave-to {
+        position: absolute;
+        transform:  translate3d(-200px, 0px, 0px);
     }
 </style>
